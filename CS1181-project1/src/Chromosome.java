@@ -1,110 +1,136 @@
 import java.util.ArrayList;
 import java.util.Random;
+
 /**
- * Chromosome class has list of items to show genetic algorithm
- * Each chromosome hae set of items
- * Randomly determined the includion
- * Class suitable for crossover, mutation and fitness calculation methods
- * It extends arrayList of item and it impliments comparable interface
+ * The Chromosome class represents a collection of Item objects and provides methods
+ * for performing genetic operations such as crossover, mutation, and fitness calculation.
  */
 public class Chromosome extends ArrayList<Item> implements Comparable<Chromosome> {
-    private static Random rng = new Random(); // Random number generator
+
+    private static Random rng = new Random();  // Random number generator for crossover and mutation
+
     /**
-     * Default constructor for Chromosome
+     * Default constructor for a Chromosome object.
+     * This constructor can be empty, as we will populate it later.
      */
     public Chromosome() {
-        // constructor without parameter
+        // No implementation needed for now.
     }
-    //Constructor overloading
+
     /**
-     * Constructor to initiate the set of items
-     * @Param ArrayList Item, for the inclusion of chromosome
+     * Constructor that creates a Chromosome from a list of items.
+     * For each item, randomly determines whether it should be included in the Chromosome.
+     *
+     * @param items A list of Item objects to create the Chromosome from.
      */
     public Chromosome(ArrayList<Item> items) {
-        for (Item item : items) {
-            Item newItem = new Item(item);
-            newItem.setIncluded(rng.nextBoolean()); // Randomly include items passed in to this Chromosome
-            this.add(newItem);
+        for (int i = 0; i < items.size(); i++) {
+            Item changingIncluding = items.get(i);
+            changingIncluding.setIncluded(rng.nextBoolean());  // Randomly set the 'included' field
+            this.add(new Item(changingIncluding));  // Add a copy of the item to the chromosome
         }
     }
+
     /**
-     * create child chromosome with crossover
-     * @param other the other parent to do crossover with
-     * @return Chromosome after crossover will be returned
+     * Performs the crossover operation between this Chromosome and another Chromosome
+     * to create and return a new child Chromosome.
+     * A random selection is made for each item, choosing from either this Chromosome
+     * or the other Chromosome.
+     *
+     * @param other The other Chromosome to perform crossover with.
+     * @return A new Chromosome representing the child produced by the crossover.
      */
     public Chromosome crossover(Chromosome other) {
-        Chromosome child = new Chromosome();
+        Chromosome child = new Chromosome();  // Create a new Chromosome (child)
 
-        // There are 7 genes, represented by the 7 items in the Chromosome
-        for (int i = 0; i < 7; i++) { // Assuming each chromosome has exactly 7 items
-            int randomNumber = rng.nextInt(10) + 1; // Random number between 1 and 10
-
-            if (randomNumber <= 5) {
-                // Use Parent 1's gene (included value)
-                child.add(new Item(this.get(i))); // Copy the item to child chromosome
-                child.get(i).setIncluded(this.get(i).isIncluded()); // Set inclusion from Parent 1
+        for (int i = 0; i < this.size(); i++) {
+            int choosingParent = rng.nextInt(10) + 1;  // Generate a random number between 1 and 10
+            if (choosingParent <= 5) {
+                child.add(new Item(this.get(i)));  // Take item from this Chromosome
             } else {
-                // Use Parent 2's gene (included value)
-                child.add(new Item(other.get(i))); //Copy the item
-                child.get(i).setIncluded(other.get(i).isIncluded()); // Set inclusion from Parent 2
+                child.add(new Item(other.get(i)));  // Take item from the other Chromosome
             }
         }
-        return child;
+
+        return child;  // Return the newly created child Chromosome
     }
+
     /**
-     * Mutate the chromosome by reversing the inclusion
-     * 10% of the time mutation occurs
+     * Performs the mutation operation on this Chromosome.
+     * A random mutation is applied to each item in the Chromosome.
+     * If an item is included, it will be excluded, and vice versa.
      */
     public void mutate() {
         for (Item item : this) {
-            if (rng.nextInt(10) == 0) {
-                item.setIncluded(!item.isIncluded()); // reverse included state
+            int mutation = rng.nextInt(10) + 1;  // Generate a random number between 1 and 10
+            if (mutation == 1) {  // With a 1/10 chance, mutate the item
+                item.setIncluded(!item.isIncluded());  // Flip the 'included' status
             }
         }
     }
+
     /**
-     * Calculate fitness of the chromosome
-     * Combined weight is less than or equal to 10 are included
-     * combined weight more than 10 are excluded
-     * @return fitness of the chromosome
+     * Calculates the fitness of this Chromosome.
+     * The fitness is determined by the sum of the values of the items that are included.
+     * If the total weight exceeds 10 pounds, the fitness is set to 0.
+     *
+     * @return The fitness of this Chromosome.
      */
     public int getFitness() {
-        double totalWeight = 0;
         int totalValue = 0;
+        double totalWeight = 0;
+
         for (Item item : this) {
             if (item.isIncluded()) {
-                totalWeight += item.getWeight();
-                totalValue += item.getValue();
+                totalWeight += item.getWeight();  // Add item weight
+                totalValue += item.getValue();  // Add item value
             }
         }
-        return totalWeight > 10 ? 0 : totalValue; // Return fitness 0 if total weight is more than 10
+
+        if (totalWeight > 10) {
+            return 0;  // Fitness is 0 if the total weight exceeds 10 pounds
+        } else {
+            return totalValue;  // Return the total value of included items
+        }
     }
+
     /**
-     * Override standard compareTo to compare two chromosomes
-     *@param Other chromosome to compare with
-     * @return return integer value
+     * Compares the fitness of this Chromosome to another Chromosome.
+     * Returns -1 if this Chromosome's fitness is greater, +1 if it's less, and 0 if they are the same.
+     *
+     * @param other The other Chromosome to compare to.
+     * @return -1, 1, or 0 based on the comparison of fitness.
      */
     @Override
     public int compareTo(Chromosome other) {
-        //Returns -1 if this chromosome’s =itness is greater than the other’s fitness, +1 if
-        //this chromosome’s fitness is less than the other one’s, and 0 if their fitness is the same
-        return Integer.compare(other.getFitness(), this.getFitness());
+        if (this.getFitness() < other.getFitness()) {
+            return +1;  // If this Chromosome's fitness is less, return +1
+        }
+        if (this.getFitness() == other.getFitness()) {
+            return 0;  // If fitness is the same, return 0
+        } else {
+            return -1;  // If this Chromosome's fitness is greater, return -1
+        }
     }
+
     /**
-     *override the toString to format the object to return specified text format
-     *  @return  string value
+     * Returns a string representation of this Chromosome.
+     * It includes the name, weight, and value of all items that are included,
+     * followed by the Chromosome's fitness.
+     *
+     * @return A string representing the Chromosome.
      */
     @Override
     public String toString() {
-        // Display Name, weight and values of all items in the format
-        // Stringbuilder is used taking reference to java guidelines from: https://www.geeksforgeeks.org/
-        StringBuilder sb = new StringBuilder();
+        StringBuilder result = new StringBuilder();
+
         for (Item item : this) {
             if (item.isIncluded()) {
-                sb.append(item.toString()).append(", ");
+                result.append("\n" + item.toString());  // Append included item to result
             }
         }
-        sb.append("Fitness: ").append(getFitness());
-        return sb.toString();
+
+        result.append("\n" + "This Chromosome has a fitness of " + this.getFitness());  // Append fitness
+        return result.toString();  // Return the final string representation
     }
 }

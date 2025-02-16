@@ -1,26 +1,37 @@
-import java.io.File;
+//Utsav Acharya
+//CLarissa
+// Project 1
+//Dhruv brother help me in cross over and campare to in Chromosome
+//Google was used i just forgot what i was for (stack over flow , oracle,jetbrain and gpt was for java doc )
+//https://www.geeksforgeeks.org/genetic-algorithms/
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Random;
 import java.util.Scanner;
+import java.io.File;
+
+
 /**
- * GeneticAlgorithm class is suppose to solve basic bin packing problem implementing the genetic algorithm
- * Problem is: maximum value of items that a fittest person take if one can take maximum of 10 pound weight only
- * It reads the items from the file, initilize, crossover, mutate over multiple generation to find fittest individual
+ * GeneticAlgorithm class implements a solution for the bin packing problem using genetic algorithms.
+ * It aims to maximize the value of items selected by an individual, subject to a weight limit of 10 pounds.
+ * The algorithm performs over multiple generations, applying initialization, crossover, mutation, and selection.
  */
 public class GeneticAlgorithm {
-    private static Random rng = new Random(); // Declare rng as a static variable
+    private static Random rng = new Random(); // Random number generator for crossover and mutation
+
     /**
-     * Read the data from a file. Each line contain Name, weight and value separated by comma & space
-     * @param filename name of the file containing items data
-     * @return array of items object taken out from the file
-     * @throws FileNotFoundException if the file specified in the file cannot be found
+     * Reads the data from a file. Each line contains the item name, weight, and value, separated by a comma and space.
+     *
+     * @param filename the name of the file containing the item data
+     * @return an ArrayList of Item objects representing the items loaded from the file
+     * @throws FileNotFoundException if the specified file is not found
      */
     public static ArrayList<Item> readData(String filename) throws FileNotFoundException {
         ArrayList<Item> items = new ArrayList<>();
         Scanner scanner = new Scanner(new File(filename));
 
+        // Read each line from the file and parse the data into Item objects
         while (scanner.hasNextLine()) {
             String line = scanner.nextLine();
             String[] parts = line.split(", ");
@@ -32,56 +43,64 @@ public class GeneticAlgorithm {
         scanner.close();
         return items;
     }
+
     /**
-     * Initilize population of chromosome randomly
-     * @param items list of Item objects to use while creating chromosomes
-     * @param populationSize number of chromosome to generate
-     * @return arraylist of Chromosome objects representing initial population
+     * Initializes the population of chromosomes. Each chromosome is randomly created based on the items.
      *
+     * @param items the list of items to be considered while creating chromosomes
+     * @param populationSize the number of chromosomes to generate in the population
+     * @return an ArrayList of Chromosome objects representing the initial population
      */
     public static ArrayList<Chromosome> initializePopulation(ArrayList<Item> items, int populationSize) {
         ArrayList<Chromosome> population = new ArrayList<>();
         for (int i = 0; i < populationSize; i++) {
-            population.add(new Chromosome(items));
+            population.add(new Chromosome(items)); // Create a new chromosome for each individual in the population
         }
         return population;
     }
+
     /**
+     * The main method that runs the genetic algorithm for 20 generations.
+     * It reads the item data, initializes the population, and performs genetic operations.
      *
-     * @param args arguement not used
-     * @throws FileNotFoundException if the file items.txt
+     * @param args command-line arguments (not used in this implementation)
+     * @throws FileNotFoundException if the file 'items.txt' cannot be found
      */
     public static void main(String[] args) throws FileNotFoundException {
+        // Step 1: Read item data from a file
         ArrayList<Item> items = readData("src\\Items.txt");
-        ArrayList<Chromosome> population = initializePopulation(items, 10);// set initial population to be 10
 
-        for (int generation = 0; generation < 20; generation++) { // repeat 20 times
+        // Step 2: Initialize the population with a size of 10
+        ArrayList<Chromosome> population = initializePopulation(items, 10);
+
+        // Step 3: Run the genetic algorithm for 20 generations
+        for (int generation = 0; generation < 20; generation++) { // Iterate for 20 generations
             ArrayList<Chromosome> nextGeneration = new ArrayList<>(population);
-            Collections.sort(nextGeneration);
+            Collections.sort(nextGeneration); // Sort the population based on fitness
 
-            // Add the top individuals to the next generation
+            // Step 4: Select the fittest individuals for the next generation
             population.clear();
-            population.addAll(nextGeneration.subList(0, 10));//adding current population to next generation
+            population.addAll(nextGeneration.subList(0, 10)); // Add the top 10 fittest individuals to the next generation
 
-            // Crossover to create new individuals
+            // Step 5: Crossover to create new offspring (children)
             while (population.size() < 10) {
-                Chromosome parent1 = nextGeneration.get(rng.nextInt(nextGeneration.size()));// first parent chosen for the generation
-                Chromosome parent2 = nextGeneration.get(rng.nextInt(nextGeneration.size()));// second parent
-                Chromosome child = parent1.crossover(parent2);
-                population.add(child);
+                Chromosome parent1 = nextGeneration.get(rng.nextInt(nextGeneration.size())); // Select first parent
+                Chromosome parent2 = nextGeneration.get(rng.nextInt(nextGeneration.size())); // Select second parent
+                Chromosome child = parent1.crossover(parent2); // Perform crossover to create a child
+                population.add(child); // Add child to the population
             }
 
-            // Mutate 10% of the population
+            // Step 6: Mutate 10% of the population to introduce variation
             for (int i = 0; i < population.size() * 0.1; i++) {
-                population.get(rng.nextInt(population.size())).mutate();
+                population.get(rng.nextInt(population.size())).mutate(); // Mutate a random individual
             }
 
-            // Sort population by fitness
+            // Step 7: Sort the population by fitness after crossover and mutation
             Collections.sort(population);
         }
 
-        // Display fittest individual first position of arrayList, to the console
+        // Step 8: Output the fittest individual (the solution) after 20 generations
         System.out.println("Fittest Individual:");
-        System.out.println(population.get(0).toString());
+        System.out.println(population.get(0).toString()); // Print the fittest individual from the population
     }
 }

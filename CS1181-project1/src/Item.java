@@ -1,41 +1,94 @@
+/**
+ * Represents an item with a name, weight, value, and inclusion status.
+ * Used in scenarios such as the Knapsack problem to determine which items are included.
+ */
 public class Item {
-    private final String name; // Item Name-A label for item
-    private final double weight; // Item Weight in pound
-    private final int value; //Item value since rounded to nearest dollar, it is integer
-    private boolean included; //Indicates whether the item should be taken or not
 
-    public Item(String name, double weight, int value) {// constructor Item with 3 parameter
+    private final String name;  // The name of the item (e.g., Jewelry, Kindle)
+    private final double weight;  // The weight of the item in pounds
+    private final int value;  // The monetary value of the item in dollars
+    private boolean included;  // Indicates if the item is included in the solution
+
+    /**
+     * Constructs an Item with the specified name, weight, and value.
+     * The 'included' status is initialized to false by default.
+     *
+     * @param name  The name of the item
+     * @param weight  The weight of the item in pounds
+     * @param value  The value of the item in dollars
+     */
+    public Item(String name, double weight, int value) {
         this.name = name;
         this.weight = weight;
         this.value = value;
-        this.included = false; // Initialize as not included
+        this.included = false;  // Default inclusion is false
     }
 
-    public Item(Item other) {// constructor for Item Class
+    /**
+     * Creates a new Item as a copy of the given item.
+     *
+     * @param other  The Item to copy from
+     */
+    public Item(Item other) {
         this.name = other.name;
         this.weight = other.weight;
         this.value = other.value;
         this.included = other.included;
     }
 
-    public double getWeight() { // getter for weight
+    /**
+     * Gets the name of the item.
+     *
+     * @return The name of the item
+     */
+    public String getName() {
+        return name;
+    }
+
+    /**
+     * Gets the weight of the item in pounds.
+     *
+     * @return The weight of the item
+     */
+    public double getWeight() {
         return weight;
     }
 
-    public int getValue() { // getter for value
+    /**
+     * Gets the value of the item in dollars.
+     *
+     * @return The value of the item
+     */
+    public int getValue() {
         return value;
     }
 
-    public boolean isIncluded() {// Check Inclusion
+    /**
+     * Checks if the item is included in the solution.
+     *
+     * @return true if the item is included, false otherwise
+     */
+    public boolean isIncluded() {
         return included;
     }
 
+    /**
+     * Sets whether the item is included in the solution.
+     *
+     * @param included true to include the item, false otherwise
+     */
     public void setIncluded(boolean included) {
-        this.included = included; // Setter for included field
+        this.included = included;
     }
 
+    /**
+     * Returns a string representation of the item, including its name, weight, and value.
+     * Example format: "Jewelry (2.5 lbs, $300)"
+     *
+     * @return A string representing the item
+     */
     @Override
-    public String toString() {// Display the item in the given form
+    public String toString() {
         return name + " (" + weight + " lbs, $" + value + ")";
     }
 }
